@@ -1,3 +1,5 @@
+settings:
+  sign: false
 name: build-flow-os
 on:
   push:
