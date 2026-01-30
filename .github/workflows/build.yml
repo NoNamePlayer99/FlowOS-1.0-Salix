@@ -17,8 +17,9 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Build Custom Image
-        uses: blue-build/github-action@v1
+        uses: blue-build/github-action@v1.10
         with:
           recipe: recipes/recipe.yml
           registry_token: ${{ github.token }}
+          cosign_private_key: ${{ secrets.COSIGN_PRIVATE_KEY }}
           maximize_build_space: true
