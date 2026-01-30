@@ -1,45 +1,63 @@
----
-# yaml-language-server: $schema=https://schema.blue-build.org/recipe-v1.json
-# image will be published to ghcr.io/<user>/<name>
-name: template
-# description will be included in the image's metadata
-description: This is my personal OS image.
+# recipes/recipe.yml
+name: flow-os-salix
+description: FlowOS 1.0 Salix - Puristisches Tablet-Erlebnis für Surface Go.
+base-image: ghcr.io/ublue-os/silverblue-main:41
 
-# the base image to build on top of (FROM) and the version tag to use
-base-image: ghcr.io/ublue-os/silverblue-main
-image-version: 42 # latest is also supported if you want new updates ASAP
+settings:
+  os-name: "FlowOS"
+  version: "1.0 Salix"
 
-# module configuration, executed in order
-# you can include multiple instances of the same module
 modules:
-  - type: files
-    files:
-      - source: system
-        destination: / # copies files/system/* (* means everything inside it) into your image's root folder /
-
-  - type: dnf
+  # 1. HARDWARE (Surface Go Support)
+  - type: rpm-ostree
     repos:
-      copr:
-        - atim/starship
+      - https://pkg.surfacelinux.com/fedora/linux-surface.repo
     install:
-      packages:
-        - micro
-        - starship
-    remove:
-      packages:
-        # example: removing firefox (in favor of the flatpak)
-        # "firefox" is the main package, "firefox-langpacks" is a dependency
-        - firefox
-        - firefox-langpacks # also remove firefox dependency (not required for all packages, this is a special case)
+      - kernel-surface
+      - iptsd
+      - surface-control
+      - libwacom-surface
+      - plymouth-theme-spinner
+      - gnome-initial-setup
+      - inter-fonts
 
-  - type: default-flatpaks
-    configurations:
-      - notify: true # Send notification after install/uninstall is finished (true/false)
-        scope: system
-        # If no repo information is specified, Flathub will be used by default
-        install: # system flatpaks we want all users to have and not remove
-          - org.mozilla.firefox
-          - org.gnome.Loupe
-      - scope: user # Also add Flathub user repo, but no user packages
+  # 2. DESIGN & TOOLS
+  - type: rpm-ostree
+    install:
+      - gnome-shell-extension-dash-to-dock
+      - gnome-shell-extension-blur-my-shell
+      - gnome-shell-extension-tiling-shell
+      - gnome-shell-extension-gesture-improvements
+      - gnome-clocks
+      - gnome-calculator
+      - gnome-camera
+      - gnome-online-accounts
+      - adw-gtk3-theme
 
-  - type: signing # this sets up the proper policy & signing files for signed images to work fully
+  # 3. APPS (Flatpaks)
+  - type: flatpak
+    first-run: true
+    install:
+      - org.mozilla.firefox
+      - com.github.rahuljennings.rnote
+      - org.gnome.Geary
+      - com.github.johnfactotum.Foliate
+      - org.gnome.Loupe
+      - io.github.bavarder.Bavarder
+
+  # 4. REINHEITS-GEBOT & AUTO-GESTURE
+  - type: script
+    snippets:
+      - "echo 'NoDisplay=true' >> /usr/share/applications/org.gnome.Terminal.desktop"
+      - "gsettings set org.gnome.shell enabled-extensions \"['dash-to-dock@micxgx.gmail.com', 'blur-my-shell@aunetx', 'tiling-shell@sbdub.github.com', 'gesture-improvements@jasonu.me']\""
+
+  # 5. UX-FINISH
+  - type: default-settings
+    dconf:
+      org/gnome/desktop/interface/font-name: 'Inter Regular 11'
+      org/gnome/desktop/interface/text-scaling-factor: 1.5
+      org/gnome/desktop/interface/color-scheme: 'prefer-dark'
+      org/gnome/shell/extensions/dash-to-dock/dock-fixed: false
+      org/gnome/shell/extensions/dash-to-dock/autohide: true
+      org/gnome/shell/extensions/dash-to-dock/dock-position: 'LEFT'
+      org/gnome/desktop/wm/preferences/button-layout: "''"
