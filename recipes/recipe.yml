@@ -61,3 +61,7 @@ modules:
       org/gnome/shell/extensions/dash-to-dock/autohide: true
       org/gnome/shell/extensions/dash-to-dock/dock-position: 'LEFT'
       org/gnome/desktop/wm/preferences/button-layout: "''"
+
+      # Ganz am Ende der recipe.yml
+configuration:
+  package-manager: dnf
