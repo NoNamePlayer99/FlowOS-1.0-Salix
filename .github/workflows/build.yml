@@ -16,15 +16,12 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Install BlueBuild CLI
-        run: |
-          # Direkt-Download der Linux-Binary
-          curl -L https://github.com/blue-build/cli/releases/download/v0.9.30/blue-build-linux-x86_64 -o blue-build
-          chmod +x blue-build
-          # Teste ob die Datei existiert und was sie ist
-          ls -l blue-build
-          ./blue-build --version
-
-      - name: Build Image
-        run: |
-          ./blue-build build ./recipes/recipe.yml --no-sign
+      - name: Build Custom Image
+        uses: blue-build/github-action@v1
+        with:
+          recipe: recipes/recipe.yml
+          registry_token: ${{ github.token }}
+          maximize_build_space: true
+          # Wir schalten die Signierung hier GANZ explizit aus:
+          is_pr: false
+          sigstore: false
