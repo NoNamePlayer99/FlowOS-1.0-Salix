@@ -8,9 +8,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    # Hier ziehen wir uns das fertige Werkzeug-Set direkt von GitHub
-    container:
-      image: ghcr.io/blue-build/cli:latest
     permissions:
       contents: read
       packages: write
@@ -19,7 +16,10 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Build Salix
+      - name: Build Image mit Podman
         run: |
-          # Das Programm ist im Container schon drin, wir rufen es nur auf
-          blue-build build ./recipes/recipe.yml --no-sign
+          # Wir bauen das Image direkt mit den Standard-Tools von GitHub
+          # Wir nutzen das Basis-Image von BlueBuild, aber führen den Befehl selbst aus
+          docker run --rm -v $(pwd):/build \
+          ghcr.io/blue-build/cli:latest \
+          blue-build build /build/recipes/recipe.yml --no-sign
