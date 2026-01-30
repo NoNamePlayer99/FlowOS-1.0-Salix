@@ -1,11 +1,8 @@
 name: build-flow-os
 on:
-  pull_request:
   push:
     branches:
       - main
-  schedule:
-    - cron: '0 0 * * TUE'
   workflow_dispatch:
 
 jobs:
@@ -15,11 +12,6 @@ jobs:
       contents: read
       packages: write
       id-token: write
-    strategy:
-      fail-fast: false
-      matrix:
-        recipe:
-          - recipe.yml
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
@@ -27,8 +19,8 @@ jobs:
       - name: Build Custom Image
         uses: blue-build/github-action@v1.10
         with:
-          recipe: ${{ matrix.recipe }}
-          cosign_private_key: "" # Leer lassen für keine Signierung
+          recipe: recipe.yml
           registry_token: ${{ github.token }}
-          pr_event_number: ${{ github.event.number }}
+          # Wir lassen cosign_private_key komplett weg 
+          # und erzwingen keine Signatur
           maximize_build_space: true
