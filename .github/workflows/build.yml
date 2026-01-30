@@ -1,5 +1,3 @@
-settings:
-  sign: false
 name: build-flow-os
 on:
   push:
@@ -24,6 +22,3 @@ jobs:
           recipe: recipes/recipe.yml
           registry_token: ${{ github.token }}
           maximize_build_space: true
-          # Wir schalten die Signierung hier GANZ explizit aus:
-          is_pr: false
-          sigstore: false
