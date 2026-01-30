@@ -17,9 +17,8 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Build Custom Image
-        uses: blue-build/github-action@v1.0.15
+        uses: blue-build/github-action@v1
         with:
           recipe: recipes/recipe.yml
           registry_token: ${{ github.token }}
           maximize_build_space: true
-          # Wir lassen cosign komplett weg, v1.0.15 erzwingt es nicht
