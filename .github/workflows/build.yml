@@ -18,10 +18,12 @@ jobs:
 
       - name: Install BlueBuild CLI
         run: |
-          curl -L https://github.com/blue-build/cli/releases/latest/download/blue-build-linux-x86_64 -o blue-build
-          chmod +x blue-build
-          sudo mv blue-build /usr/local/bin/blue-build
+          # Offizielles Installations-Skript nutzen
+          curl -fsSL https://blue-build.org/install.sh | sh
+          # Sicherstellen, dass es im Pfad ist
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
 
-      - name: Build Image (Manual Mode)
+      - name: Build Image
         run: |
-          blue-build build ./recipes/recipe.yml --no-sign
+          # Den Build-Befehl mit absolutem Pfad und dem No-Sign Flag ausführen
+          $HOME/.local/bin/blue-build build ./recipes/recipe.yml --no-sign
