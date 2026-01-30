@@ -16,12 +16,13 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Install BlueBuild (Official Script)
+      - name: Install and Build
         run: |
-          # Wir nutzen das offizielle Skript, das installiert es direkt nach /usr/local/bin
-          curl -fsSL https://blue-build.org/install.sh | sh
-
-      - name: Build Image
-        run: |
-          # Wir rufen es direkt auf und erzwingen "no-sign"
-          blue-build build ./recipes/recipe.yml --no-sign
+          # 1. Installation in einen lokalen Ordner erzwingen
+          curl -fsSL https://blue-build.org/install.sh | BINDIR=. sh
+          
+          # 2. Direkt prüfen, ob die Datei da ist
+          ls -l ./blue-build
+          
+          # 3. Den Build sofort mit dem lokalen Programm starten
+          ./blue-build build ./recipes/recipe.yml --no-sign
