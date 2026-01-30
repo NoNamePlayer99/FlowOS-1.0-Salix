@@ -19,10 +19,32 @@ jobs:
       - name: Build Salix Image
         run: |
           cat <<EOF > Containerfile
-          FROM quay.io/fedora-ostree-desktops/kinoite:41
+          # Wir wechseln auf Silverblue (GNOME), da das für dein Surface Go ideal ist
+          FROM quay.io/fedora-ostree-desktops/silverblue:41
+
+          # 1. Surface Repo & Hardware-Fixes
           RUN curl -s https://pkg.surfacelinux.com/fedora/linux-surface.repo -o /etc/yum.repos.d/linux-surface.repo
-          RUN rpm-ostree install kernel-surface surface-control iptsd libwacom-surface && rpm-ostree cleanup -a
-          RUN rpm-ostree override remove kernel kernel-core kernel-modules kernel-modules-extra --install kernel-surface
+          
+          # 2. Kernel & Libwacom Konflikt lösen
+          RUN rpm-ostree override replace \
+              --experimental \
+              --from repo=linux-surface \
+              libwacom libwacom-data && \
+              rpm-ostree override remove kernel kernel-core kernel-modules kernel-modules-extra --install kernel-surface && \
+              rpm-ostree install surface-control iptsd libwacom-surface
+
+          # 3. Deine Salix App-Auswahl & Performance Tools
+          RUN rpm-ostree install \
+              gnome-tweaks \
+              gnome-software-plugin-flatpak \
+              firefox \
+              vlc \
+              htop \
+              celluloid && \
+              rpm-ostree cleanup -a
+
+          # 4. Flathub für den "App Store"
+          RUN flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
           EOF
           buildah bud -t flow-os:latest .
 
