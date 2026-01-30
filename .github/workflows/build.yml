@@ -16,11 +16,12 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Build Custom Image
-        uses: blue-build/github-action@v1.10
-        with:
-          recipe: recipe.yml
-          registry_token: ${{ github.token }}
-          # Wir lassen cosign_private_key komplett weg 
-          # und erzwingen keine Signatur
-          maximize_build_space: true
+      - name: Install BlueBuild CLI
+        run: |
+          curl -L https://github.com/blue-build/cli/releases/latest/download/blue-build-linux-x86_64 -o blue-build
+          chmod +x blue-build
+          sudo mv blue-build /usr/local/bin/blue-build
+
+      - name: Build Image (Manual Mode)
+        run: |
+          blue-build build ./recipes/recipe.yml --no-sign
