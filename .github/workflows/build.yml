@@ -16,10 +16,12 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Install BlueBuild CLI
-        uses: blue-build/setup-action@v1.0.0
+      - name: Install BlueBuild (Official Script)
+        run: |
+          # Wir nutzen das offizielle Skript, das installiert es direkt nach /usr/local/bin
+          curl -fsSL https://blue-build.org/install.sh | sh
 
       - name: Build Image
         run: |
-          # Jetzt nutzen wir das installierte Programm direkt
+          # Wir rufen es direkt auf und erzwingen "no-sign"
           blue-build build ./recipes/recipe.yml --no-sign
