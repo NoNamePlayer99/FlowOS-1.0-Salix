@@ -17,7 +17,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Build Custom Image
-        uses: blue-build/github-action@v1.10
+        uses: blue-build/github-action@v1.11
         with:
           recipe: recipe.yml
           registry_token: ${{ github.token }}
