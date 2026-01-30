@@ -1,5 +1,5 @@
 # recipes/recipe.yml
-name: flow-os-salix
+name: flow-os
 description: FlowOS 1.0 Salix - Puristisches Tablet-Erlebnis
 base-image: ghcr.io/ublue-os/silverblue-main:41
 
