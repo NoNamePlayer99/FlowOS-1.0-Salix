@@ -16,32 +16,17 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - - name: Build Salix Image
+      - name: Build Salix Image
         run: |
-          # Wir schreiben das Containerfile mit allen nötigen Schritten
           cat <<EOF > Containerfile
           FROM quay.io/fedora-ostree-desktops/kinoite:41
-
-          # 1. Das Microsoft Surface Repository für Fedora hinzufügen
           RUN curl -s https://pkg.surfacelinux.com/fedora/linux-surface.repo -o /etc/yum.repos.d/linux-surface.repo
-
-          # 2. Die Surface-Spezialpakete installieren
-          # Wir installieren den Kernel, die Kontrolle und den Touch-Treiber (iptsd)
-          RUN rpm-ostree install \
-              kernel-surface \
-              surface-control \
-              iptsd \
-              libwacom-surface && \
-              rpm-ostree cleanup -a
-
-          # 3. Den Standard-Kernel durch den Surface-Kernel ersetzen (WICHTIG für Touch)
+          RUN rpm-ostree install kernel-surface surface-control iptsd libwacom-surface && rpm-ostree cleanup -a
           RUN rpm-ostree override remove kernel kernel-core kernel-modules kernel-modules-extra --install kernel-surface
           EOF
-
-          # Bauen mit buildah
           buildah bud -t flow-os:latest .
+
       - name: Push to GitHub Packages
         run: |
-          # Einloggen und hochladen
           echo "${{ github.token }}" | buildah login ghcr.io -u ${{ github.actor }} --password-stdin
           buildah push flow-os:latest docker://ghcr.io/${{ github.repository_owner }}/salix:latest
