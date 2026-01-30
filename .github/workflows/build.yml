@@ -16,9 +16,13 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Build Custom Image
-        uses: blue-build/github-action@v1
-        with:
-          recipe: recipes/recipe.yml
-          registry_token: ${{ github.token }}
-          maximize_build_space: true
+      - name: Install BlueBuild
+        run: |
+          # Wir holen uns die funktionierende Version direkt
+          curl -L https://github.com/blue-build/cli/releases/download/v0.9.30/blue-build-linux-x86_64 -o blue-build
+          chmod +x blue-build
+
+      - name: Build Image (Manual Force)
+        run: |
+          # Wir nutzen das --no-sign Flag direkt im Befehl
+          ./blue-build build ./recipes/recipe.yml --no-sign
