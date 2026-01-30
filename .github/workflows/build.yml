@@ -8,6 +8,9 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    # Hier ziehen wir uns das fertige Werkzeug-Set direkt von GitHub
+    container:
+      image: ghcr.io/blue-build/cli:latest
     permissions:
       contents: read
       packages: write
@@ -16,13 +19,7 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Install and Build
+      - name: Build Salix
         run: |
-          # 1. Installation in einen lokalen Ordner erzwingen
-          curl -fsSL https://blue-build.org/install.sh | BINDIR=. sh
-          
-          # 2. Direkt prüfen, ob die Datei da ist
-          ls -l ./blue-build
-          
-          # 3. Den Build sofort mit dem lokalen Programm starten
-          ./blue-build build ./recipes/recipe.yml --no-sign
+          # Das Programm ist im Container schon drin, wir rufen es nur auf
+          blue-build build ./recipes/recipe.yml --no-sign
