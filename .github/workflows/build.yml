@@ -11,30 +11,22 @@ jobs:
     permissions:
       contents: read
       packages: write
+      id-token: write
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
 
       - name: Build Salix Image
-        id: build
-        uses: redhat-actions/buildah-build@v2
-        with:
-          image: flow-os
-          tags: latest v1.0
-          # Wir nutzen direkt das Fedora Kinoite Image als Basis
-          base-image: quay.io/fedora-ostree-desktops/kinoite:41
-          containerfiles: |
-            FROM quay.io/fedora-ostree-desktops/kinoite:41
-            # Hier installieren wir die Surface-Spezial-Sachen direkt
-            RUN rpm-ostree contact-setup-surface && \
-                rpm-ostree install kernel-surface surface-control && \
-                rpm-ostree cleanup -a
+        run: |
+          # Wir erstellen eine Bau-Anleitung (Dockerfile)
+          echo "FROM quay.io/fedora-ostree-desktops/kinoite:41" > Containerfile
+          echo "RUN rpm-ostree install kernel-surface surface-control && rpm-ostree cleanup -a" >> Containerfile
+
+          # Wir bauen das Image
+          buildah bud -t flow-os:latest .
 
       - name: Push to GitHub Packages
-        uses: redhat-actions/push-to-registry@v2
-        with:
-          image: ${{ steps.build.outputs.image }}
-          tags: ${{ steps.build.outputs.tags }}
-          registry: ghcr.io/${{ github.repository_owner }}
-          username: ${{ github.actor }}
-          password: ${{ github.token }}
+        run: |
+          # Einloggen und hochladen
+          echo "${{ github.token }}" | buildah login ghcr.io -u ${{ github.actor }} --password-stdin
+          buildah push flow-os:latest docker://ghcr.io/${{ github.repository_owner }}/salix:latest
