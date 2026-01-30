@@ -16,13 +16,10 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Install BlueBuild
-        run: |
-          # Wir holen uns die funktionierende Version direkt
-          curl -L https://github.com/blue-build/cli/releases/download/v0.9.30/blue-build-linux-x86_64 -o blue-build
-          chmod +x blue-build
+      - name: Install BlueBuild CLI
+        uses: blue-build/setup-action@v1.0.0
 
-      - name: Build Image (Manual Force)
+      - name: Build Image
         run: |
-          # Wir nutzen das --no-sign Flag direkt im Befehl
-          ./blue-build build ./recipes/recipe.yml --no-sign
+          # Jetzt nutzen wir das installierte Programm direkt
+          blue-build build ./recipes/recipe.yml --no-sign
